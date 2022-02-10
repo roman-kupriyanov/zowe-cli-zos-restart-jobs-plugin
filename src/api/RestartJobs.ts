@@ -40,72 +40,63 @@ export class RestartJobs {
         stepname: string,
         job: IJob
     ): Promise<string> {
-        const jobJcl: string = await GetJobs.getJclForJob(session, job);
+        const upperCasedStepName = stepname.toUpperCase();
+        const jobJcl = await GetJobs.getJclForJob(session, job);
 
-        const newJclLines: string[] = [];
-        const restartParamLine: string = `// RESTART=(${stepname.toUpperCase()})`;
-        let isStepFound: boolean = false;
-        let isRestartParmFound: boolean = false;
-
-        for (const line of jobJcl.split("\n")) {
-            // Transform to upper case to check for substrings
-            const upperCasedLine = line.toUpperCase();
-
-            // Line actually to be added in new JCL
-            let lineToAdd: string = line.toString();
-
-            // Do not try to process comment lines
-            if (!upperCasedLine.startsWith("//*")) {
-                if (upperCasedLine.indexOf("JOB") >= 0) {
-                    // Remove redundant `jobid` at the end of JOB statement
-                    lineToAdd = line.replace(job.jobid, "");
-                }
-
-                if (!isRestartParmFound) {
-                    // Trim white spaces just in case to be able to check last line symbol
-                    lineToAdd = lineToAdd.trim();
-
-                    // If already specified RESTART= parm is found -> replace it with new step name
-                    // and stop searching
-                    if (lineToAdd.match(/RESTART=\(\S*\)/)) {
-                        lineToAdd = lineToAdd.replace(
-                            /RESTART=\(\S*\)/,
-                            `RESTART=(${stepname})`
-                        );
-                        isRestartParmFound = true;
-                    }
-
-                    // If no RESTART= parm is found inline and it is no continuation to next line ->
-                    // add continuation and RESTART= parm on next line, then stop searching
-                    if (!isRestartParmFound && !lineToAdd.endsWith(",")) {
-                        lineToAdd += ",";
-                        newJclLines.push(lineToAdd);
-                        newJclLines.push(restartParamLine);
-                        isRestartParmFound = true;
-                        continue;
-                    }
-                }
-
-                // Check if specified step name really exists in JCL
-                if (upperCasedLine.indexOf("EXEC") >= 0) {
-                    if (
-                        upperCasedLine.startsWith(`//${stepname.toUpperCase()}`)
-                    ) {
-                        isStepFound = true;
-                    }
-                }
-            }
-
-            newJclLines.push(lineToAdd);
-        }
-
-        if (!isStepFound) {
+        // Check if specified step name really exists in JCL
+        if (!new RegExp(`//${upperCasedStepName}\\s+EXEC`, "i").test(jobJcl)) {
             throw new ImperativeError({
-                msg: `Step name ${stepname} is not found in a job with jobid ${job.jobid}`,
+                msg: `Step name ${upperCasedStepName} is not found in a job with jobid ${job.jobid}`,
             });
         }
 
-        return newJclLines.join("\n");
+        let isJobStatementFound = false;
+        let isRestartParamAdded = false;
+        return (
+            jobJcl
+                .split("\n")
+                // Remove redundant jobid at the end of the JOB statement
+                // And trim all the lines
+                .map((rawLine) =>
+                    (/JOB/i.test(rawLine)
+                        ? rawLine.replace(job.jobid, "")
+                        : rawLine
+                    ).trim()
+                )
+                // Search where the RESTART= parameter can be added
+                .map((clearedLine) => {
+                    // Do not try to process comment lines
+                    if (clearedLine.startsWith("//*")) return clearedLine;
+
+                    // Signal that the JOB statement processing has started
+                    if (/JOB/i.test(clearedLine)) isJobStatementFound = true;
+
+                    // If the JOB statement is processed and the restart parameter was not added yet
+                    if (isJobStatementFound && !isRestartParamAdded) {
+                        // If already specified RESTART= parm is found -> replace it with new step name
+                        // and stop searching
+                        if (clearedLine.match(/RESTART=\(\S*\)/i)) {
+                            isRestartParamAdded = true;
+                            return clearedLine.replace(
+                                /RESTART=\(\S*\)/i,
+                                `RESTART=(${upperCasedStepName})`
+                            );
+                        }
+
+                        // If no RESTART= parm is found inline and it is no continuation to next line ->
+                        // add continuation and RESTART= parm on next line, then stop searching
+                        if (!clearedLine.endsWith(",")) {
+                            isRestartParamAdded = true;
+                            return [
+                                `${clearedLine},`,
+                                `// RESTART=(${upperCasedStepName})`,
+                            ].join("\n");
+                        }
+                    }
+                    return clearedLine;
+                })
+                .join("\n")
+        );
     }
 
     /**
