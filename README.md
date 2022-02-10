@@ -1,8 +1,11 @@
-# IBM z/OS Jobs Restart Plug-in for Zowe CLI
+# IBM z/OS Jobs Restart Plug-in for Zowe CLI <!-- omit in toc -->
 
 The IBM z/OS Jobs Restart Plug-in for Zowe CLI lets you extend Zowe CLI to allow restart operation for z/OS jobs.
 
 - [How the plug-in works](#how-the-plug-in-works)
+  - [Implementation details](#implementation-details)
+  - [Command format](#command-format)
+  - [Examples](#examples)
 - [Software requirements](#software-requirements)
 - [Installing](#installing)
 - [Building from source](#building-from-source)
@@ -39,11 +42,13 @@ Where:
 
 - `<jobid>` - ID of a job (e.g. `JOB01234`)
 - `<stepname>` - ID of a step within a job (e.g. `STEP001`)
-- `[options]` -  optional parameters like:
+- `[options]` - optional parameters like:
+
   - z/OSMF Connection options
   - Profile options
   - Response format options
   - Command-specific options:
+
     ```
     --view-all-spool-content  | --vasc (boolean)
 
@@ -96,9 +101,11 @@ Build the plug-in from source and install it into your Zowe CLI implementation.
     ```
     yarn install
     ```
+
     The command installs the required dependencies for the plug-in and several development tools. You can run the task at any time to update the tools as needed.
 
 2.  To build your code changes, issue the following command:
+
     ```
     yarn build
     ```
@@ -110,7 +117,9 @@ Build the plug-in from source and install it into your Zowe CLI implementation.
     ```
     zowe plugins install @zowe/zos-restart-jobs-plugin
     ```
+
     Or:
+
     ```
     zowe plugins install .
     ```
@@ -137,6 +146,7 @@ When an unsuccessful message displays, you can troubleshoot the installation by 
 This plug-in requires z/OSMF end-point and credentials to issue the commands. Those parameters can be specified using restart command options.
 
 **Note:** For more information, issue the following command:
+
 ```
 zowe zos-restart-jobs restart jes --help
 ```
@@ -149,6 +159,7 @@ zowe profiles set zosmf <profile name>
 ```
 
 **Note:** For more information, issue the following commands:
+
 ```
 zowe profiles create zosmf --help
 zowe profiles set zosmf --help
