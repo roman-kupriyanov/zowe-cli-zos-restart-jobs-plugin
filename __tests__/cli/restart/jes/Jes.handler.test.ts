@@ -70,7 +70,8 @@ const DEFAULT_PARAMETERS: IHandlerParameters = {
     },
     definition: JesDefinition,
     fullDefinition: JesDefinition,
-    profiles: PROFILES
+    profiles: PROFILES,
+    positionals: []
 };
 
 describe("JesHandler tests", () => {
