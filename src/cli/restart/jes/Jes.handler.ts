@@ -10,19 +10,21 @@
  */
 
 import {
+    ConnectionPropsForSessCfg,
     ICommandHandler,
     IHandlerParameters,
+    ISession,
     ITaskWithStatus,
+    Session,
     TaskProgress,
     TaskStage,
 } from "@zowe/imperative";
 import { ZosmfSession } from "@zowe/cli";
 import { RestartJobs } from "../../../api/RestartJobs";
 import { IRestartParms } from "../../../api/doc/input/IRestartParms";
-import { isNullOrUndefined } from "util";
 
 /**
- * "zos-restart-jobs restart jes" command handler. Restart a job with Job ID from a specified step name.
+ * "zos-restart-jobs restart jes" command handler. Restart a job with Job ID starting from a specified step name.
  *
  * @export
  * @class JesHandler
@@ -42,9 +44,15 @@ export default class JesHandler implements ICommandHandler {
         const stepname: string = commandParameters.arguments.stepname + "";
 
         // Create session from arguments
-        const session = ZosmfSession.createBasicZosmfSessionFromArguments(
+        const sessCfg = ZosmfSession.createSessCfgFromArgs(
             commandParameters.arguments
         );
+        const sessCfgWithCreds =
+            await ConnectionPropsForSessCfg.addPropsOrPrompt<ISession>(
+                sessCfg,
+                commandParameters.arguments
+            );
+        const session = new Session(sessCfgWithCreds);
 
         const status: ITaskWithStatus = {
             statusMessage: "Restarting job",
@@ -82,7 +90,7 @@ export default class JesHandler implements ICommandHandler {
         }
 
         // Print the response to the command
-        if (isNullOrUndefined(spoolFilesResponse)) {
+        if (!spoolFilesResponse) {
             commandParameters.response.format.output({
                 fields: ["jobid", "retcode", "jobname", "status"],
                 output: apiObj,
@@ -94,10 +102,7 @@ export default class JesHandler implements ICommandHandler {
             // Print data from spool content
         } else {
             for (const spoolFile of spoolFilesResponse) {
-                if (
-                    !isNullOrUndefined(spoolFile.procName) &&
-                    spoolFile.procName.length > 0
-                ) {
+                if (spoolFile.procName && spoolFile.procName.length > 0) {
                     commandParameters.response.console.log(
                         "Spool file: %s (ID #%d, Step: %s, ProcStep: %s)",
                         spoolFile.ddName,
@@ -121,10 +126,7 @@ export default class JesHandler implements ICommandHandler {
         }
 
         // Print path where spool content was downloaded
-        if (
-            !isNullOrUndefined(directory) &&
-            isNullOrUndefined(spoolFilesResponse)
-        ) {
+        if (directory && !spoolFilesResponse) {
             directory = directory.includes("./") ? directory : `./${directory}`;
             commandParameters.response.console.log(
                 `Successfully downloaded output to ${directory}/${apiObj.jobid}`

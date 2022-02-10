@@ -9,7 +9,7 @@
  *
  */
 
-import { IJob, GetJobs, SubmitJobs, JOB_STATUS } from "@zowe/cli";
+import { IJob, GetJobs, SubmitJobs, JOB_STATUS, ISpoolFile } from "@zowe/cli";
 import {
     AbstractSession,
     ImperativeError,
@@ -39,7 +39,7 @@ export class RestartJobs {
         session: AbstractSession,
         stepname: string,
         job: IJob
-    ) {
+    ): Promise<string> {
         const jobJcl: string = await GetJobs.getJclForJob(session, job);
 
         const newJclLines: string[] = [];
@@ -116,14 +116,14 @@ export class RestartJobs {
      * @param {string} jobid - job id to be translated into parms object
      * @param {string} stepname - a name of a step, which to restart from
      * @throws {ImperativeError} - throws an error if job is in ACTIVE state and return code is not "CC 0000"
-     * @returns {Promise<IJob>} - Promise that resolves to an IJob document with details about the restarted job
+     * @returns {Promise<string>} - promise that resolves to a string, which contains JCL to be restarted
      * @memberof RestartJobs
      */
     public static async getFailedJobRestartJcl(
         session: AbstractSession,
         jobid: string,
         stepname: string
-    ) {
+    ): Promise<string> {
         // Get the job details
         const job: IJob = await GetJobs.getJob(session, jobid);
 
@@ -159,7 +159,7 @@ export class RestartJobs {
         session: AbstractSession,
         jobid: string,
         stepname: string
-    ) {
+    ): Promise<IJob> {
         // Get the restart job JCL
         const restartJobJcl: string = await this.getFailedJobRestartJcl(
             session,
@@ -189,7 +189,7 @@ export class RestartJobs {
         jobid: string,
         stepname: string,
         parms: IRestartParms
-    ) {
+    ): Promise<IJob | ISpoolFile[]> {
         // Get the restart job JCL
         const restartJobJcl: string = await this.getFailedJobRestartJcl(
             session,
