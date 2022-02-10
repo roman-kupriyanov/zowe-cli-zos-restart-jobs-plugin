@@ -127,9 +127,12 @@ export default class JesHandler implements ICommandHandler {
 
         // Print path where spool content was downloaded
         if (directory && !spoolFilesResponse) {
-            directory = directory.includes("./") ? directory : `./${directory}`;
+            directory = /^\.$|^\.\//.test(directory)
+                ? directory
+                : `./${directory}`;
+            directory = directory.endsWith("/") ? directory : `${directory}/`;
             commandParameters.response.console.log(
-                `Successfully downloaded output to ${directory}/${apiObj.jobid}`
+                `Successfully downloaded output to ${directory}${apiObj.jobid}`
             );
         }
         commandParameters.response.progress.endBar();
