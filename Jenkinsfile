@@ -56,7 +56,7 @@ node('ca-jenkins-agent') {
     pipeline.createStage(
         name: "Lint",
         stage: {
-            sh "npm run lint"
+            sh "yarn lint"
         },
         timeout: [
             time: 2,
@@ -78,7 +78,7 @@ node('ca-jenkins-agent') {
     pipeline.test(
         name: "Unit",
         operation: {
-            sh "npm run test:unit"
+            sh "yarn test:unit"
         },
         testResults: [dir: "${UNIT_TEST_ROOT}/jest-stare", files: "index.html", name: "${PRODUCT_NAME} - Unit Test Report"],
         coverageResults: [dir: "__tests__/__results__/unit/coverage/lcov-report", files: "index.html", name: "${PRODUCT_NAME} - Unit Test Coverage Report"],
@@ -107,8 +107,8 @@ node('ca-jenkins-agent') {
     pipeline.test(
         name: "Integration",
         operation: {
-            sh "npm i -g @zowe/cli@latest"
-            sh "npm run test:integration"
+            sh "yarn install -g @zowe/cli@latest"
+            sh "yarn test:integration"
         },
         testResults: [dir: "${INTEGRATION_TEST_ROOT}/jest-stare", files: "index.html", name: "${PRODUCT_NAME} - Integration Test Report"],
         junitOutput: INTEGRATION_JUNIT_OUTPUT,

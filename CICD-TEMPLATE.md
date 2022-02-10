@@ -72,9 +72,9 @@ Review the following descriptions to understand what occurs in each stage of the
     * Because this CI/CD template is intended for Zowe CLI   plug-in development, we assume that you will always need to install a copy of Zowe CLI in to the build environment to prepare for later stages.
     * We decided to install Zowe CLI on every build to ensure that we always have the latest version of Zowe CLI. However this stage can be remove if the user chooses to pre-install Brightside in the Linux build agent.
 * <b>Install Dependencies:</b>
-  In this stage, we issue the "npm install" command to install all npm dependencies defined in the package.json file of the plug-in.
+  In this stage, we issue the `yarn install` command to install all npm dependencies defined in the package.json file of the plug-in.
 * <b>Build:</b>
-In this stage, we issue the "npm run build" command and archive built artifacts.
+In this stage, we issue the `yarn build` command and archive built artifacts.
 * <b>Unit Test:</b>
   In this stage, we perform unit tests and record the results so that we can monitor the progress.
 * <b>Integration Test:</b>

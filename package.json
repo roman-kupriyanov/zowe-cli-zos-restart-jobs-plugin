@@ -21,18 +21,18 @@
     "lib"
   ],
   "scripts": {
-    "build": "node scripts/updateLicense.js && tsc --pretty && npm run checkTestsCompile",
+    "build": "node scripts/updateLicense.js && tsc --pretty && yarn checkTestsCompile",
     "checkTestsCompile": "echo \"Checking that test source compiles...\" && tsc --project __tests__/tsconfig.json --noEmit",
-    "prebuild": "npm run clean && npm run lint && echo Using TypeScript && tsc --version",
+    "prebuild": "yarn clean && yarn lint && echo Using TypeScript && tsc --version",
     "clean": "rimraf lib",
     "watch": "tsc --pretty --watch",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "yarn build",
     "lint": "tslint \"src/**/*.ts\"",
-    "test": "npm run test:unit && npm run test:integration && npm run test:system",
+    "test": "yarn test:unit && yarn test:integration && yarn test:system",
     "test:system": "env-cmd -f __tests__/__resources__/env/system.env jest .*/__system__/.* --coverage false",
     "test:integration": "env-cmd -f __tests__/__resources__/env/integration.env jest .*/__integration__/.* --coverage false",
     "test:unit": "env-cmd -f __tests__/__resources__/env/unit.env jest --coverage --testPathIgnorePatterns \".*/__system__|__integration__/.*\"",
-    "installPlugin": "npm i && npm run clean && npm run build && zowe plugins install .",
+    "installPlugin": "yarn && yarn clean && yarn build && zowe plugins install .",
     "exec-plugin": "zowe zos-restart-jobs restart jes",
     "exec-zowe": "zowe"
   },

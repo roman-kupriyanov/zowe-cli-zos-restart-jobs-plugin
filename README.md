@@ -94,16 +94,16 @@ Build the plug-in from source and install it into your Zowe CLI implementation.
 1.  The first time that you clone the IBM z/OS Jobs Restart Plug-in for Zowe CLI GitHub repository, issue the following command against the local directory:
 
     ```
-    npm install
+    yarn install
     ```
     The command installs the required dependencies for the plug-in and several development tools. You can run the task at any time to update the tools as needed.
 
 2.  To build your code changes, issue the following command:
     ```
-    npm run build
+    yarn build
     ```
 
-    **Note:** When you update `package.json` to include new dependencies, or when you pull changes that affect `package.json`, issue the `npm update` command to download the dependencies.
+    **Note:** When you update `package.json` to include new dependencies, or when you pull changes that affect `package.json`, issue the `yarn upgrade` command to download the dependencies.
 
 3.  Issue one of the following commands to install the plug-in:
 
@@ -118,7 +118,7 @@ Build the plug-in from source and install it into your Zowe CLI implementation.
 Or just use the following command to execute previous commands all at once:
 
 ```
-npm run installPlugin
+yarn installPlugin
 ```
 
 **Tip:** After the installation process completes, it validates that the plug-in was installed correct and the names of its commands, options, and arguments do not conflict with that of the other plug-ins that you installed into your Zowe CLI implementation.
@@ -166,13 +166,13 @@ You can perform the following types of tests on the IBM Jobs Restart Plug-in:
 
 Issue the following commands to run the tests:
 
-1. `npm run test:unit`
-2. `npm run test:integration`
-3. `npm run test:system`
+1. `yarn test:unit`
+2. `yarn test:integration`
+3. `yarn test:system`
 
 Or run them all at once with:
 
-`npm run test`
+`yarn test`
 
 ## Uninstalling
 
