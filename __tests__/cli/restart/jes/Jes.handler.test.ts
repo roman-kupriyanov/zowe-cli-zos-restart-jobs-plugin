@@ -14,6 +14,7 @@ import {
     CommandProfiles,
     IHandlerParameters,
     IProfile,
+    ISession,
     Session,
     TaskProgress,
     TaskStage,
@@ -116,7 +117,7 @@ describe("JesHandler tests", () => {
     };
 
     const testProfile = PROFILE_MAP.get("zosmf")[0];
-    const testSession: Session = new Session({
+    const testSessionCfg: ISession = {
         type: "basic",
         hostname: testProfile.host,
         port: testProfile.port,
@@ -124,11 +125,12 @@ describe("JesHandler tests", () => {
         password: testProfile.password,
         rejectUnauthorized,
         protocol,
-    });
+    };
+    const testSession: Session = new Session(testSessionCfg);
 
-    const createBasicZosmfSessionFromArgumentsSpy = jest.spyOn(
+    const createSessCfgFromArgsSpy = jest.spyOn(
         ZosmfSession,
-        "createBasicZosmfSessionFromArguments"
+        "createSessCfgFromArgs"
     );
     const restartFailedJobWithParmsSpy = jest.spyOn(
         RestartJobs,
@@ -136,10 +138,8 @@ describe("JesHandler tests", () => {
     );
 
     beforeEach(() => {
-        createBasicZosmfSessionFromArgumentsSpy.mockClear();
-        createBasicZosmfSessionFromArgumentsSpy.mockImplementation(
-            () => testSession
-        );
+        createSessCfgFromArgsSpy.mockClear();
+        createSessCfgFromArgsSpy.mockImplementation(() => testSessionCfg);
 
         restartFailedJobWithParmsSpy.mockClear();
         restartFailedJobWithParmsSpy.mockImplementation(() =>
@@ -170,10 +170,8 @@ describe("JesHandler tests", () => {
 
         await handler.process(commandParameters);
 
-        expect(createBasicZosmfSessionFromArgumentsSpy).toHaveBeenCalledTimes(
-            1
-        );
-        expect(createBasicZosmfSessionFromArgumentsSpy).toHaveBeenCalledWith(
+        expect(createSessCfgFromArgsSpy).toHaveBeenCalledTimes(1);
+        expect(createSessCfgFromArgsSpy).toHaveBeenCalledWith(
             commandParameters.arguments
         );
 

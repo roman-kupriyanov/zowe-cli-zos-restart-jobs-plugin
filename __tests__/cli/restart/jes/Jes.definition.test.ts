@@ -14,7 +14,7 @@ import { ICommandDefinition } from "@zowe/imperative";
 describe("zos-restart-jobs restart jes", () => {
     it("should not have changed", () => {
         const definition: ICommandDefinition =
-            require("../../../../src/cli/restart/jes/Jes.definition").JesDefinition;
+            require("../../../../src/cli/restart/jes/Jes.definition").jesDefinition;
         expect(definition).toBeDefined();
         expect(definition.handler).toContain("Jes.handler");
         delete definition.handler;

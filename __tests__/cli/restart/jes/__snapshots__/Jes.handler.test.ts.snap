@@ -55,6 +55,4 @@ Object {
 }
 `;
 
-exports[`JesHandler tests should call the restartFailedJobWithParms API 4`] = `"Successfully downloaded output to .//JOB04541"`;
-
-exports[`JesHandler tests should call the restartFailedJobWithParms API 5`] = `"Restarted JCL with jobid \\"JOB04541\\" starting from step \\"STEP02\\""`;
+exports[`JesHandler tests should call the restartFailedJobWithParms API 4`] = `"Restarted JCL with jobid \\"JOB04541\\" starting from step \\"STEP02\\""`;
